@@ -1,20 +1,20 @@
 @students = [] # an empty array accessible to all methods
 
-def interactive_menu
-  loop do
-    # 1. print the menu and ask th use what to do
-    print_menu
-    # 2. read the input and save it into a variable
-    process(gets.chomp) # this tells the selection of the user to get chomp.
-  end# 3. do what the user has asked
-end
-
 def print_menu # extracting the code that prints the menu into it own method. this is refracting
   puts "1. Input the student"
   puts "2. Show the studetns"
   puts "3. Save the list to students.csv"
   puts "4. Load the list from students.csv"
   puts "9. Exit"
+end
+
+def interactive_menu
+  loop do
+    # 1. print the menu and ask th use what to do
+    print_menu
+    # 2. read the input and save it into a variable
+    process(STDIN.gets.chomp) # this tells the selection of the user to get chomp.
+  end# 3. do what the user has asked
 end
 
 def show_students # extracting the code that shows the students into it own method. this is refracting
@@ -42,11 +42,10 @@ def process(selection)
 end
 
 def input_students
-  @students = []
   puts "Please enter the names of the students."
-  name = gets.chomp
+  name = STDIN.gets.chomp
   puts "Please enter their cohort month. To finish, just hit enter twice."
-  cohort = gets.chomp
+  cohort = STDIN.gets.chomp
 
   #while the name variable is not empty, repeat the following code.
   while !name.empty? do
@@ -59,8 +58,8 @@ def input_students
       puts "Now we have #{@students.count} great students."
     end
     #now we get another name from the user
-    name = gets.chomp
-    cohort = gets.chomp
+    name = STDIN.gets.chomp
+    cohort = STDIN.gets.chomp
   end
   #return the array of students
   if @students.length >= 1
@@ -84,8 +83,8 @@ def save_students
   file.close # everytime a file is opened it must be closed.
 end
 
-def load_students # the method that loads the file of students.
-  file = File.open("students.csv", "r") # first we open the specific filename and make it readable.
+def load_students(filename = "students.csv") # the method that loads the file of students from start up and is used to access to ARGV, with "students.csv" being the default value.
+  file = File.open(filename, "r") # first we open the specific filename and make it readable.
   file.readlines.each do |line| # then we iterate over 'each' line in the file using 'readlines'
   name, cohort = line.chomp.split(',')
   # the trailing character line is discarded and it is split at the comman ','
@@ -96,6 +95,19 @@ def load_students # the method that loads the file of students.
   end
   file.close # the file is closed.
 end
+
+def try_load_students # this method is used to load an existing (or not) file to be used at launch of the program.
+  filename = ARGV.first # first argument from the command line. e.g. ruby directory.rb 'students.csv' <- this is the filename.
+  return if filename.nil? #get out of the method if it isn't given (i.e. "return" to the original program)
+  if File.exists?(filename) # if it exists.
+    load_students(filename) # calls the load_students method with the given filename as the argument
+    puts "Loaded #{@students.count} from #{filename}."
+  else # if it doesn't exists
+    puts "Sorry, #{filename} doesn't exist."
+    exit # quits program
+  end
+end
+
 =begin
 @students = [
   {name: "Dr. Hannibal Lecter", cohort: :november, country: "USA"},
@@ -170,7 +182,7 @@ def print_footer
   puts "Overall, we have #{@students.count} great students.".center(100)
 end
 # nothing happens until will call the methods
-
+try_load_students
 interactive_menu
 #print_cohort(students)
 #print_numbered(students)
