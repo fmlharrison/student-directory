@@ -13,6 +13,7 @@ def print_menu # extracting the code that prints the menu into it own method. th
   puts "1. Input the student"
   puts "2. Show the studetns"
   puts "3. Save the list to students.csv"
+  puts "4. Load the list from students.csv"
   puts "9. Exit"
 end
 
@@ -30,6 +31,8 @@ def process(selection)
       show_students # call the method that shows the students
     when "3"
       save_students
+    when "4"
+      load_students
     when "9"
       exit # this will terminate the program
     else
@@ -81,6 +84,18 @@ def save_students
   file.close # everytime a file is opened it must be closed.
 end
 
+def load_students # the method that loads the file of students.
+  file = File.open("students.csv", "r") # first we open the specific filename and make it readable.
+  file.readlines.each do |line| # then we iterate over 'each' line in the file using 'readlines'
+  name, cohort = line.chomp.split(',')
+  # the trailing character line is discarded and it is split at the comman ','
+  # (which is then discarded) and assigned to 2 variables at the same time: 'name, cohort' => this is called parallel assignment.
+  # If the assigned value is an array, then the first variable will get the first value of the array,
+  # the second variable – the second value and so on. Eahc line has 2 values, so the the new array will only have 2 values.
+    @students << {name: name, cohort: cohort.to_sym} # The line is put in a new hash usinf {} and pushed to the @student array.
+  end
+  file.close # the file is closed.
+end
 =begin
 @students = [
   {name: "Dr. Hannibal Lecter", cohort: :november, country: "USA"},
