@@ -72,11 +72,11 @@ def show_students
 end
 
 def save_students
-  CSV.open(@filename, "wb") do |csv| 
+  CSV.open(@filename, "wb") do |csv|
     @students.each do |student|
       csv << [student[:name], student[:cohort]]
     end
-    puts "Fab! The new student(s) were successfully saved!"
+    puts "Fab! The new student(s) were successfully saved to #{@filename}"
     puts " "
   end
 end
