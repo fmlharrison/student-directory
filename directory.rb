@@ -1,5 +1,5 @@
+require "csv" # This is used so ruby can use the CSV library
 @students = []
-#@filename = ""
 
 def print_menu
   puts "1. Input the student"
@@ -68,11 +68,9 @@ def input_students
 end
 
 def save_students
-  File.open(@filename, "w") do |file|
+  CSV.open(@filename, "wb") do |csv| # using CSV.open to always make sure the students are saved to a CSV file.
     @students.each do |student|
-      student_data = [student[:name], student[:cohort]]
-      csv_line = student_data.join(",")
-      file.puts csv_line
+      csv << [student[:name], student[:cohort]]
     end
     puts "Fab! The new student(s) were successfully saved!"
     puts " "
@@ -102,10 +100,10 @@ def try_load_students
   end
 end
 
-def which_file # this method is used to choose which file we want to load from.
+def which_file
   puts "Which file would you like to save to/load from?"
   which_file = STDIN.gets.chomp
-  if which_file.empty? == true # use a if loop to do make sure the input is correct.
+  if which_file.empty? == true 
     @filename = "students.csv"
   else
     @filename = which_file
