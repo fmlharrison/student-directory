@@ -41,6 +41,8 @@ def process(selection)
   # 4. repeat from step 1
 end
 
+private
+
 def input_students
   puts "Please enter the names of the students."
   name = STDIN.gets.chomp
@@ -51,13 +53,15 @@ def input_students
   while !name.empty? do
     cohort = "september" if cohort.empty?
     #add the student hash to the array
-    @students << {name: name, cohort: cohort.to_sym}
+    add_students(name, cohort)
+    #@students << {name: name, cohort: cohort.to_sym}
     if @students.length == 1
       puts "Now we have #{@students.count} great student."
     else
       puts "Now we have #{@students.count} great students."
     end
     #now we get another name from the user
+    puts "Please enter another students and their cohort. If you are done, hit enter twice."
     name = STDIN.gets.chomp
     cohort = STDIN.gets.chomp
   end
@@ -91,21 +95,26 @@ def load_students(filename = "students.csv") # the method that loads the file of
   # (which is then discarded) and assigned to 2 variables at the same time: 'name, cohort' => this is called parallel assignment.
   # If the assigned value is an array, then the first variable will get the first value of the array,
   # the second variable – the second value and so on. Eahc line has 2 values, so the the new array will only have 2 values.
-    @students << {name: name, cohort: cohort.to_sym} # The line is put in a new hash usinf {} and pushed to the @student array.
+    add_students(name, cohort) # The line is put in a new hash usinf {} and pushed to the @student array.
   end
   file.close # the file is closed.
 end
 
 def try_load_students # this method is used to load an existing (or not) file to be used at launch of the program.
   filename = ARGV.first # first argument from the command line. e.g. ruby directory.rb 'students.csv' <- this is the filename.
-  return if filename.nil? #get out of the method if it isn't given (i.e. "return" to the original program)
-  if File.exists?(filename) # if it exists.
+  if filename.nil?
+    load_students(filename = "students.csv") # This is to load the file "students.csv" by default even if no file is given in the CL.
+  elsif File.exists?(filename) # if it exists.
     load_students(filename) # calls the load_students method with the given filename as the argument
     puts "Loaded #{@students.count} from #{filename}."
   else # if it doesn't exists
     puts "Sorry, #{filename} doesn't exist."
     exit # quits program
   end
+end
+
+def add_students(name, cohort) # This method is used to replace the block below in the other methods.
+  @students << {name: name, cohort: cohort.to_sym}
 end
 
 =begin
