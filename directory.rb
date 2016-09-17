@@ -1,10 +1,11 @@
 @students = []
+#@filename = ""
 
 def print_menu
   puts "1. Input the student"
-  puts "2. Show the studetns"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
+  puts "2. Show the students"
+  puts "3. Save the list"
+  puts "4. Load the list"
   puts "9. Exit"
 end
 
@@ -28,9 +29,11 @@ def process(selection)
     when "2"
       show_students
     when "3"
+      which_file
       save_students
     when "4"
-      load_students
+      which_file
+      load_students(@students)
     when "9"
       exit
     else
@@ -65,7 +68,7 @@ def input_students
 end
 
 def save_students
-  file = File.open("students.csv", "w")
+  file = File.open(@filename, "w")
 
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
@@ -77,8 +80,8 @@ def save_students
   file.close
 end
 
-def load_students(filename = "students.csv")
-  file = File.open(filename, "r")
+def load_students(filename)
+  file = File.open(@filename, "r")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(',')
     add_students(name, cohort)
@@ -90,13 +93,23 @@ end
 def try_load_students
   filename = ARGV.first
   if filename.nil?
-    load_students(filename = "students.csv")
+    load_students(@filename = "students.csv")
   elsif File.exists?(filename)
     load_students(filename)
     puts "Loaded #{@students.count} from #{filename}."
   else
     puts "Sorry, #{filename} doesn't exist."
     exit
+  end
+end
+
+def which_file # this method is used to choose which file we want to load from.
+  puts "Which file would you like to save to/load from?"
+  which_file = STDIN.gets.chomp
+  if which_file.empty? == true
+    @filename = "students.csv"
+  else
+    @filename = which_file
   end
 end
 
