@@ -72,7 +72,7 @@ def show_students
 end
 
 def save_students
-  CSV.open(@filename, "wb") do |csv| # using CSV.open to always make sure the students are saved to a CSV file. "wb" is used when you want to write to a CSV file.
+  CSV.open(@filename, "wb") do |csv| 
     @students.each do |student|
       csv << [student[:name], student[:cohort]]
     end
@@ -80,16 +80,6 @@ def save_students
     puts " "
   end
 end
-
-#def load_students(filename)
-#  File.open(@filename, "r") do |file|
-#    file.readlines.each do |line|
-#      name, cohort = line.chomp.split(',')
-#      add_students(name, cohort)
-#    end
-#    puts "students.csv has been successfully loaded!"
-#  end
-#end
 
 def load_students(filename)
   CSV.foreach(@filename) do |row|
@@ -118,11 +108,7 @@ end
 def which_file
   puts "Which file would you like to save to/load from? Remember to use .csv"
   which_file = STDIN.gets.chomp
-  if which_file.empty? == true
-    @filename = "students.csv"
-  else
-    @filename = which_file
-  end
+  which_file.empty? == true ? (@filename = "students.csv") : (@filename = which_file)
 end
 
 def add_students(name, cohort)
