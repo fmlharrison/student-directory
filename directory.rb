@@ -6,6 +6,7 @@ def print_menu
   puts "2. Show the students"
   puts "3. Save the list"
   puts "4. Load the list"
+  puts "5. Show students by cohort"
   puts "9. Exit"
 end
 
@@ -14,12 +15,6 @@ def interactive_menu
     print_menu
     process(STDIN.gets.chomp)
   end
-end
-
-def show_students
-  print_header
-  print_student_list
-  print_footer
 end
 
 def process(selection)
@@ -33,11 +28,14 @@ def process(selection)
       save_students
     when "4"
       which_file
-      load_students(@students)
+      load_students(@filename)
+    when "5"
+      print_cohort
     when "9"
       exit
     else
       puts "I don't know what you meant, try again"
+      puts ""
   end
 end
 
@@ -47,7 +45,7 @@ def input_students
   puts "Please enter the names of the students."
   name = STDIN.gets.chomp
   puts "Please enter their cohort month. To finish, just hit enter twice."
-  cohort = STDIN.gets.chomp
+  cohort = STDIN.gets.chomp.downcase
 
   while !name.empty? do
     cohort = "september" if cohort.empty?
@@ -67,8 +65,14 @@ def input_students
   end
 end
 
+def show_students
+  print_header
+  print_numbered
+  print_footer
+end
+
 def save_students
-  CSV.open(@filename, "wb") do |csv| # using CSV.open to always make sure the students are saved to a CSV file.
+  CSV.open(@filename, "wb") do |csv| # using CSV.open to always make sure the students are saved to a CSV file. "wb" is used when you want to write to a CSV file.
     @students.each do |student|
       csv << [student[:name], student[:cohort]]
     end
@@ -77,14 +81,24 @@ def save_students
   end
 end
 
+#def load_students(filename)
+#  File.open(@filename, "r") do |file|
+#    file.readlines.each do |line|
+#      name, cohort = line.chomp.split(',')
+#      add_students(name, cohort)
+#    end
+#    puts "students.csv has been successfully loaded!"
+#  end
+#end
+
 def load_students(filename)
-  File.open(@filename, "r") do |file|
-    file.readlines.each do |line|
-      name, cohort = line.chomp.split(',')
-      add_students(name, cohort)
-    end
-    puts "students.csv has been successfully loaded!"
+  CSV.foreach(@filename) do |row|
+    name, cohort = row
+    add_students(name, cohort)
   end
+  puts ""
+  puts "Done! #{@filename} has been successfully loaded!"
+  puts ""
 end
 
 def try_load_students
@@ -92,8 +106,9 @@ def try_load_students
   if filename.nil?
     load_students(@filename = "students.csv")
   elsif File.exists?(filename)
-    load_students(filename)
+    load_students(@filename = filename)
     puts "Loaded #{@students.count} from #{filename}."
+    puts ""
   else
     puts "Sorry, #{filename} doesn't exist."
     exit
@@ -101,9 +116,9 @@ def try_load_students
 end
 
 def which_file
-  puts "Which file would you like to save to/load from?"
+  puts "Which file would you like to save to/load from? Remember to use .csv"
   which_file = STDIN.gets.chomp
-  if which_file.empty? == true 
+  if which_file.empty? == true
     @filename = "students.csv"
   else
     @filename = which_file
@@ -138,14 +153,15 @@ def print_header
 end
 
 def print_cohort
-  cohort = "november".to_sym
-  @students.map { |student| puts "#{student[:name]} (#{student[:cohort]} cohort)".center(100) if student[:cohort] == cohort}
+  puts "Which cohort do you want to see?"
+  cohort = gets.chomp.to_sym
+  i = 0
+  @students.select { |student| puts "#{i+=1}. #{student[:name]}".center(100) if student[:cohort] == cohort.downcase}
+  puts "There are #{i} students in the #{cohort} cohort.".center(100)
 end
 
 def print_student_list
-  @students.each do |student|
-    puts "#{student[:name]} (#{student[:cohort]} cohort)".center(100)
-  end
+  @students.each { |student| puts "#{student[:name]} (#{student[:cohort]} cohort)".center(100)}
 end
 
 def print_student_full
@@ -157,9 +173,7 @@ def print_student_full
 end
 
 def print_numbered
-  @students.each_with_index do |student, index| #each_with_index take the index of the oject in the array and lets to use it.
-    puts "#{index.to_i+1}. #{student[:name]} (#{student[:cohort]} cohort)"
-  end
+  @students.each_with_index { |student, index| puts "#{index.to_i+1}. #{student[:name]} (#{student[:cohort]} cohort)".center(100)}
 end
 
 
@@ -188,10 +202,7 @@ def print_footer
   puts "Overall, we have #{@students.count} great students.".center(100)
 end
 
+print IO.read($0)
+
 try_load_students
 interactive_menu
-#print_cohort(students)
-#print_numbered(students)
-#print_student_letter(students)
-#print_student_length(students)
-#print_student_country(students)
