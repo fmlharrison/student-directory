@@ -68,26 +68,25 @@ def input_students
 end
 
 def save_students
-  file = File.open(@filename, "w")
-
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+  File.open(@filename, "w") do |file|
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+    end
+    puts "Fab! The new student(s) were successfully saved!"
+    puts " "
   end
-  puts "Fab! The new student(s) were successfully saved!"
-  puts " "
-  file.close
 end
 
 def load_students(filename)
-  file = File.open(@filename, "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
-    add_students(name, cohort)
+  File.open(@filename, "r") do |file|
+    file.readlines.each do |line|
+      name, cohort = line.chomp.split(',')
+      add_students(name, cohort)
+    end
+    puts "students.csv has been successfully loaded!"
   end
-  puts "students.csv has been successfully loaded!"
-  file.close
 end
 
 def try_load_students
@@ -106,7 +105,7 @@ end
 def which_file # this method is used to choose which file we want to load from.
   puts "Which file would you like to save to/load from?"
   which_file = STDIN.gets.chomp
-  if which_file.empty? == true
+  if which_file.empty? == true # use a if loop to do make sure the input is correct.
     @filename = "students.csv"
   else
     @filename = which_file
